@@ -18,7 +18,7 @@
 
 **Purpose**: Shared infrastructure and TypeScript types
 
-- [ ] T001 [P] Add FilterState and FilterOption interfaces in client/src/types/filter.ts
+- [ ] T001 [P] Add FilterState, FilterOption interfaces and PAGE_SIZE=12 constant in client/src/types/filter.ts
 - [ ] T002 [P] Add GamesResponse and PaginationState interfaces in client/src/types/game.ts
 
 **Checkpoint**: Types ready for backend and frontend development
@@ -63,7 +63,8 @@
 - [ ] T017 [US1] Add URL sync with $effect for filter state in client/src/components/GameList.svelte
 - [ ] T018 [US1] Update EmptyState.svelte with filter-aware messaging in client/src/components/EmptyState.svelte
 - [ ] T019 [US1] Add data-testid attributes to FilterBar controls in client/src/components/FilterBar.svelte
-- [ ] T020 [P] [US1] Create filtering.spec.ts E2E tests in client/e2e-tests/filtering.spec.ts
+- [ ] T019a [US1] Verify FilterBar integration in index.astro (GameList includes FilterBar via Svelte composition)
+- [ ] T020 [P] [US1] Create filtering.spec.ts E2E tests in client/e2e-tests/filtering.spec.ts (include assertion that all DB categories/publishers appear in dropdowns)
 
 **Checkpoint**: User Story 1 complete - filters work, URL syncs, empty state shows
 
@@ -110,7 +111,7 @@
 - [ ] T034 [US3] Verify focus states on LoadMoreButton in client/src/components/LoadMoreButton.svelte
 - [ ] T035 [US3] Add keyboard event handlers (Enter, Escape) where needed in client/src/components/FilterBar.svelte
 - [ ] T036 [P] [US3] Update accessibility.spec.ts with new component tests in client/e2e-tests/accessibility.spec.ts
-- [ ] T037 [US3] Run axe-core audit and fix any violations
+- [ ] T037 [US3] Run axe-core audit and verify 0 violations (pass criteria: accessibilityScanResults.violations === [])
 
 **Checkpoint**: User Story 3 complete - axe-core passes, keyboard navigation works
 
@@ -120,7 +121,7 @@
 
 **Purpose**: Final validation across all user stories
 
-- [ ] T038 [P] Update GameList to reset offset when filters change in client/src/components/GameList.svelte
+- [ ] T038 [P] Verify GameList resets offset to 0 when filters change (distinct from T017 URL sync; ensures fresh results)
 - [ ] T039 Run full E2E test suite: .\scripts\run-e2e-tests.ps1
 - [ ] T040 Run full backend test suite: .\scripts\run-server-tests.ps1
 - [ ] T041 [P] Verify SC-001: Filter results update <1s
@@ -216,11 +217,11 @@ US3: T029 → T030 → T031 → T032 → T033 → T034 → T035
 |-------|-------|----------|
 | Phase 1: Setup | 2 | 2 |
 | Phase 2: Foundational | 9 | 5 |
-| Phase 3: US1 Filtering | 9 | 1 |
+| Phase 3: US1 Filtering | 10 | 1 |
 | Phase 4: US2 Load More | 8 | 1 |
 | Phase 5: US3 Accessibility | 9 | 1 |
 | Phase 6: Polish | 6 | 3 |
-| **Total** | **43** | **13** |
+| **Total** | **44** | **13** |
 
 ---
 

@@ -29,9 +29,9 @@ As a user browsing the game catalog, I want to filter games by category and publ
 
 ---
 
-### User Story 2 - Pagination on Game List (Priority: P2)
+### User Story 2 - Load More on Game List (Priority: P2)
 
-As a user browsing a large game catalog, I want the game list to be paginated so that pages load quickly and I can navigate through games in manageable chunks.
+As a user browsing a large game catalog, I want to load more games incrementally so that pages load quickly and I can browse through games in manageable chunks.
 
 **Why this priority**: Performance and usability degrade as the catalog grows; pagination is foundational infrastructure that filtering depends on.
 
@@ -89,19 +89,19 @@ As a user with accessibility needs, I want the site to follow accessibility best
 - **FR-009**: Clicking "Load more" MUST append the next batch of games to the existing list
 - **FR-010**: Loaded state MUST be reflected in the URL for bookmarking/sharing
 - **FR-011**: "Load more" MUST work correctly when filters are applied
-- **FR-018**: "Load more" button MUST be hidden when all matching games are displayed
+- **FR-012**: "Load more" button MUST be hidden when all matching games are displayed
 
 #### Filter UI
-- **FR-019**: Filter controls MUST be displayed in a horizontal bar above the game grid
-- **FR-020**: Filter bar MUST use responsive design suitable for small screens (collapsible or stacked layout)
+- **FR-013**: Filter controls MUST be displayed in a horizontal bar above the game grid
+- **FR-014**: Filter bar MUST use responsive design with stacked layout on small screens (flex-col sm:flex-row pattern)
 
 #### Accessibility
-- **FR-012**: All interactive elements MUST be keyboard navigable (Tab, Enter, Escape)
-- **FR-013**: All images and icons MUST have appropriate alt text or aria-labels
-- **FR-014**: Color contrast MUST meet WCAG AA standards (4.5:1 for normal text, 3:1 for large text)
-- **FR-015**: Focus states MUST be visible on all interactive elements
-- **FR-016**: Dynamic content changes MUST be announced to screen readers via ARIA live regions
-- **FR-017**: Existing accessibility.spec.ts tests MUST continue to pass
+- **FR-015**: All interactive elements MUST be keyboard navigable (Tab, Enter, Escape)
+- **FR-016**: All images and icons MUST have appropriate alt text or aria-labels
+- **FR-017**: Color contrast MUST meet WCAG AA standards (4.5:1 for normal text, 3:1 for large text)
+- **FR-018**: Focus states MUST be visible on all interactive elements
+- **FR-019**: Dynamic content changes MUST be announced to screen readers via ARIA live regions
+- **FR-020**: Existing accessibility.spec.ts tests MUST continue to pass
 
 ### Key Entities
 
