@@ -55,16 +55,16 @@
 
 ### Implementation for User Story 1
 
-- [ ] T012 [US1] Create FilterBar.svelte component with category/publisher dropdowns in client/src/components/FilterBar.svelte
-- [ ] T013 [US1] Add responsive layout (flex-col sm:flex-row) to FilterBar in client/src/components/FilterBar.svelte
-- [ ] T014 [US1] Add Clear Filters button to FilterBar in client/src/components/FilterBar.svelte
-- [ ] T015 [US1] Update GameList.svelte to fetch categories and publishers on mount in client/src/components/GameList.svelte
-- [ ] T016 [US1] Update GameList.svelte to pass filter state to API calls in client/src/components/GameList.svelte
-- [ ] T017 [US1] Add URL sync with $effect for filter state in client/src/components/GameList.svelte
-- [ ] T018 [US1] Update EmptyState.svelte with filter-aware messaging in client/src/components/EmptyState.svelte
-- [ ] T019 [US1] Add data-testid attributes to FilterBar controls in client/src/components/FilterBar.svelte
-- [ ] T019a [US1] Verify FilterBar integration in index.astro (GameList includes FilterBar via Svelte composition)
-- [ ] T020 [P] [US1] Create filtering.spec.ts E2E tests in client/e2e-tests/filtering.spec.ts (include assertion that all DB categories/publishers appear in dropdowns)
+- [x] T012 [US1] Create FilterBar.svelte component with category/publisher dropdowns in client/src/components/FilterBar.svelte
+- [x] T013 [US1] Add responsive layout (flex-col sm:flex-row) to FilterBar in client/src/components/FilterBar.svelte
+- [x] T014 [US1] Add Clear Filters button to FilterBar in client/src/components/FilterBar.svelte
+- [x] T015 [US1] Update GameList.svelte to fetch categories and publishers on mount in client/src/components/GameList.svelte
+- [x] T016 [US1] Update GameList.svelte to pass filter state to API calls in client/src/components/GameList.svelte
+- [x] T017 [US1] Add URL sync with $effect for filter state in client/src/components/GameList.svelte
+- [x] T018 [US1] Update EmptyState.svelte with filter-aware messaging in client/src/components/EmptyState.svelte
+- [x] T019 [US1] Add data-testid attributes to FilterBar controls in client/src/components/FilterBar.svelte
+- [x] T019a [US1] Verify FilterBar integration in index.astro (GameList includes FilterBar via Svelte composition)
+- [x] T020 [P] [US1] Create filtering.spec.ts E2E tests in client/e2e-tests/filtering.spec.ts (include assertion that all DB categories/publishers appear in dropdowns)
 
 **Checkpoint**: User Story 1 complete - filters work, URL syncs, empty state shows
 

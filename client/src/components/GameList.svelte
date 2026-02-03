@@ -4,25 +4,51 @@
     import LoadingSkeleton from "./LoadingSkeleton.svelte";
     import ErrorMessage from "./ErrorMessage.svelte";
     import EmptyState from "./EmptyState.svelte";
+    import FilterBar from "./FilterBar.svelte";
+    import type { Game, GamesResponse } from "../types/game";
+    import type { FilterOption, FilterState } from "../types/filter";
+    import { PAGE_SIZE } from "../types/filter";
 
-    interface Game {
-        id: number;
-        title: string;
-        description: string;
-        publisher_name?: string;
-        category_name?: string;
-    }
-
-    let { games = $bindable([]) }: { games?: Game[] } = $props();
+    // State
+    let games = $state<Game[]>([]);
     let loading = $state(true);
     let error = $state<string | null>(null);
+    let categories = $state<FilterOption[]>([]);
+    let publishers = $state<FilterOption[]>([]);
+    let filterState = $state<FilterState>({ categoryId: null, publisherId: null });
+    let total = $state(0);
+    let hasMore = $state(false);
+    let offset = $state(0);
 
-    const fetchGames = async () => {
+    // Build API URL with filter and pagination params
+    function buildApiUrl(): string {
+        const params = new URLSearchParams();
+        if (filterState.categoryId !== null) {
+            params.set('category_id', String(filterState.categoryId));
+        }
+        if (filterState.publisherId !== null) {
+            params.set('publisher_id', String(filterState.publisherId));
+        }
+        params.set('limit', String(PAGE_SIZE));
+        params.set('offset', String(offset));
+        return `/api/games?${params.toString()}`;
+    }
+
+    // Fetch games with current filters
+    async function fetchGames(append: boolean = false): Promise<void> {
         loading = true;
+        error = null;
         try {
-            const response = await fetch('/api/games');
-            if(response.ok) {
-                games = await response.json();
+            const response = await fetch(buildApiUrl());
+            if (response.ok) {
+                const data: GamesResponse = await response.json();
+                if (append) {
+                    games = [...games, ...data.games];
+                } else {
+                    games = data.games;
+                }
+                total = data.total;
+                hasMore = data.hasMore;
             } else {
                 error = `Failed to fetch data: ${response.status} ${response.statusText}`;
             }
@@ -31,27 +57,112 @@
         } finally {
             loading = false;
         }
-    };
+    }
+
+    // Fetch categories for filter dropdown
+    async function fetchCategories(): Promise<void> {
+        try {
+            const response = await fetch('/api/categories');
+            if (response.ok) {
+                categories = await response.json();
+            }
+        } catch (err) {
+            console.error('Failed to fetch categories:', err);
+        }
+    }
+
+    // Fetch publishers for filter dropdown
+    async function fetchPublishers(): Promise<void> {
+        try {
+            const response = await fetch('/api/publishers');
+            if (response.ok) {
+                publishers = await response.json();
+            }
+        } catch (err) {
+            console.error('Failed to fetch publishers:', err);
+        }
+    }
+
+    // Handle filter changes
+    function handleFilterChange(newState: FilterState): void {
+        filterState = newState;
+        offset = 0; // Reset offset when filters change
+        fetchGames(false);
+        syncUrl();
+    }
+
+    // Sync filter state to URL
+    function syncUrl(): void {
+        const params = new URLSearchParams();
+        if (filterState.categoryId !== null) {
+            params.set('category', String(filterState.categoryId));
+        }
+        if (filterState.publisherId !== null) {
+            params.set('publisher', String(filterState.publisherId));
+        }
+        if (offset > 0) {
+            params.set('offset', String(offset));
+        }
+        const url = params.toString() ? `?${params.toString()}` : window.location.pathname;
+        history.replaceState({}, '', url);
+    }
+
+    // Read filter state from URL on mount
+    function readUrlParams(): void {
+        const params = new URLSearchParams(window.location.search);
+        const categoryParam = params.get('category');
+        const publisherParam = params.get('publisher');
+        const offsetParam = params.get('offset');
+        
+        filterState = {
+            categoryId: categoryParam ? parseInt(categoryParam, 10) : null,
+            publisherId: publisherParam ? parseInt(publisherParam, 10) : null
+        };
+        offset = offsetParam ? parseInt(offsetParam, 10) : 0;
+    }
+
+    // Derive empty state message based on filters
+    let emptyMessage = $derived(
+        filterState.categoryId !== null || filterState.publisherId !== null
+            ? "No games match your current filters. Try adjusting your selection."
+            : "No games available at the moment."
+    );
 
     onMount(() => {
-        fetchGames();
+        readUrlParams();
+        fetchCategories();
+        fetchPublishers();
+        fetchGames(false);
     });
 </script>
 
 <div>
     <h2 class="text-2xl font-medium mb-6 text-slate-100">Featured Games</h2>
     
-    {#if loading}
+    <FilterBar 
+        {categories}
+        {publishers}
+        {filterState}
+        onFilterChange={handleFilterChange}
+    />
+    
+    {#if loading && games.length === 0}
         <LoadingSkeleton count={6} />
     {:else if error}
-        <ErrorMessage error={error} />
+        <ErrorMessage {error} />
     {:else if games.length === 0}
-        <EmptyState message="No games available at the moment." />
+        <EmptyState message={emptyMessage} />
     {:else}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" data-testid="games-grid">
             {#each games as game (game.id)}
                 <GameCard {game} />
             {/each}
         </div>
+        
+        {#if loading}
+            <div class="mt-6">
+                <LoadingSkeleton count={3} />
+            </div>
+        {/if}
     {/if}
 </div>
