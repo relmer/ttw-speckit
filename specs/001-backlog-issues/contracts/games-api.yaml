@@ -1,0 +1,219 @@
+openapi: 3.0.3
+info:
+  title: Tailspin Toys API - Games Filtering & Pagination
+  version: 1.1.0
+  description: API extensions for game filtering and load-more pagination
+
+servers:
+  - url: http://localhost:5100
+    description: Local Flask development server
+
+paths:
+  /api/games:
+    get:
+      summary: Get games with optional filtering and pagination
+      description: Returns a paginated list of games with optional category and publisher filters
+      operationId: getGames
+      parameters:
+        - name: category_id
+          in: query
+          required: false
+          description: Filter by category ID
+          schema:
+            type: integer
+            example: 1
+        - name: publisher_id
+          in: query
+          required: false
+          description: Filter by publisher ID
+          schema:
+            type: integer
+            example: 2
+        - name: limit
+          in: query
+          required: false
+          description: Number of games to return (default 12, max 100)
+          schema:
+            type: integer
+            default: 12
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          required: false
+          description: Number of games to skip (for load-more pagination)
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        '200':
+          description: Paginated list of games
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GamesResponse'
+              example:
+                games:
+                  - id: 1
+                    title: "Pipeline Panic"
+                    description: "Build your DevOps pipeline before chaos ensues"
+                    publisher:
+                      id: 1
+                      name: "DevGames Inc"
+                    category:
+                      id: 1
+                      name: "Strategy"
+                    starRating: 4.5
+                total: 25
+                hasMore: true
+
+  /api/categories:
+    get:
+      summary: Get all categories
+      description: Returns all game categories for filter dropdown
+      operationId: getCategories
+      responses:
+        '200':
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Category'
+              example:
+                - id: 1
+                  name: "Strategy"
+                  description: "Games requiring tactical thinking"
+                  game_count: 5
+                - id: 2
+                  name: "Card Game"
+                  description: "Card-based gameplay"
+                  game_count: 3
+
+  /api/publishers:
+    get:
+      summary: Get all publishers
+      description: Returns all publishers for filter dropdown
+      operationId: getPublishers
+      responses:
+        '200':
+          description: List of publishers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Publisher'
+              example:
+                - id: 1
+                  name: "DevGames Inc"
+                  description: "Developer-themed games"
+                  game_count: 4
+
+components:
+  schemas:
+    GamesResponse:
+      type: object
+      required:
+        - games
+        - total
+        - hasMore
+      properties:
+        games:
+          type: array
+          items:
+            $ref: '#/components/schemas/Game'
+        total:
+          type: integer
+          description: Total number of games matching filters
+          example: 25
+        hasMore:
+          type: boolean
+          description: Whether more games are available to load
+          example: true
+
+    Game:
+      type: object
+      required:
+        - id
+        - title
+        - description
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: "Pipeline Panic"
+        description:
+          type: string
+          example: "Build your DevOps pipeline before chaos ensues"
+        publisher:
+          $ref: '#/components/schemas/PublisherRef'
+        category:
+          $ref: '#/components/schemas/CategoryRef'
+        starRating:
+          type: number
+          format: float
+          nullable: true
+          example: 4.5
+
+    PublisherRef:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    CategoryRef:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    Category:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Strategy"
+        description:
+          type: string
+          nullable: true
+          example: "Games requiring tactical thinking"
+        game_count:
+          type: integer
+          example: 5
+
+    Publisher:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "DevGames Inc"
+        description:
+          type: string
+          nullable: true
+          example: "Developer-themed games"
+        game_count:
+          type: integer
+          example: 4
