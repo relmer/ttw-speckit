@@ -30,3 +30,22 @@ export interface Game {
     category: Category | null;
     starRating: number | null;
 }
+
+/**
+ * Paginated response from GET /api/games
+ */
+export interface GamesResponse {
+    games: Game[];
+    total: number;
+    hasMore: boolean;
+}
+
+/**
+ * Represents the current pagination state
+ */
+export interface PaginationState {
+    offset: number;
+    limit: number;
+    total: number;
+    hasMore: boolean;
+}

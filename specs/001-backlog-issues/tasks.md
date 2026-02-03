@@ -18,10 +18,10 @@
 
 **Purpose**: Shared infrastructure and TypeScript types
 
-- [ ] T001 [P] Add FilterState, FilterOption interfaces and PAGE_SIZE=12 constant in client/src/types/filter.ts
-- [ ] T002 [P] Add GamesResponse and PaginationState interfaces in client/src/types/game.ts
+- [x] T001 [P] Add FilterState, FilterOption interfaces and PAGE_SIZE=12 constant in client/src/types/filter.ts
+- [x] T002 [P] Add GamesResponse and PaginationState interfaces in client/src/types/game.ts
 
-**Checkpoint**: Types ready for backend and frontend development
+**Checkpoint**: Types ready for backend and frontend development ✅
 
 ---
 
