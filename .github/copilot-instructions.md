@@ -1,88 +1,76 @@
-# Tailspin Toys Crowd Funding Development Guidelines
+# Tailspin Toys Development Guidelines
 
-This is a crowdfunding platform for games with a developer theme. The application uses a Flask backend API with SQLAlchemy ORM for database interactions, and an Astro/Svelte frontend with Tailwind CSS for styling. Please follow these guidelines when contributing:
+A game crowdfunding platform with Flask/SQLAlchemy backend and Astro/Svelte 5 frontend.
 
-## Agent notes
+## Architecture Overview
 
-- Explore the project before beginning code generation
-- Create todo lists for long operations
-  - Before each step in a todo list, reread the instructions to ensure you always have the right directions
-- Always use instructions files when available, reviewing before generating code
-- Do not generate summary markdown files upon completion of a task
-- Always use absolute paths when running scripts and BASH commands
-- **Do NOT commit or push changes unless explicitly instructed to do so by the user**
+```
+server/          → Flask API (port 5100) with SQLAlchemy ORM
+  models/        → Game, Publisher, Category with to_dict() serialization
+  routes/        → Blueprints: games_bp, publishers_bp (pattern: get_<resource>_base_query())
+client/          → Astro SSR (port 4321) with Svelte 5 components
+  src/pages/     → File-based routing (*.astro files)
+  src/components/→ Svelte 5 components using $props(), $state, $derived
+data/            → SQLite database (tailspin-toys.db)
+```
 
-## Code standards
+**Data Flow**: Astro pages → fetch `/api/*` → Flask routes → SQLAlchemy → SQLite
 
-### Required Before Each Commit
+## Agent Behavior
 
-#### Testing guidelines
+- **Explore first** before generating code; create todo lists for multi-step tasks
+- Use `.github/instructions/*.instructions.md` files for technology-specific patterns
+- Use absolute paths for all scripts and commands
+- **Do NOT commit/push** unless explicitly instructed
 
-- Run Python tests to ensure backend functionality, and Playwright tests to ensure e2e and frontend functionality
-- Review the existing tests to ensure we're not duplicating efforts
-- Test code should be of the same quality as the rest of the project, and follow DRY principles
-- For frontend changes, run builds in the client directory to verify build success and the end-to-end tests, to ensure everything works correctly
-- When making API changes, update and run the corresponding tests to ensure everything works correctly
+## Scripts (use `.ps1` on Windows, `.sh` on Linux/macOS)
 
-#### Project guidelines
+| Command | Purpose |
+|---------|---------|
+| `.\scripts\start-app.ps1` | Start both servers (runs setup-env first) |
+| `.\scripts\run-server-tests.ps1` | Run Python unit tests |
+| `.\scripts\run-e2e-tests.ps1` | Run Playwright E2E tests |
 
-- When updating models, ensure database migrations are included if needed
-- When adding new functionality, make sure you update the README
-- Make sure all guidance in the Copilot Instructions file is updated with any relevant changes, including to project structure and scripts, and programming guidance
+## Key Patterns
 
-### Code formatting requirements
+### Flask Routes (`server/routes/`)
+```python
+def get_games_base_query() -> Query:  # Reusable query with joins
+    return db.session.query(Game).join(Publisher, isouter=True).join(Category, isouter=True)
 
-- When writing Python, you must use type hints for return values and function parameters.
+@games_bp.route('/api/games/<int:id>')
+def get_game(id: int) -> tuple[Response, int] | Response:  # Type hints required
+```
 
-### Python and Flask Patterns
+### SQLAlchemy Models (`server/models/`)
+- Include `to_dict()` for JSON serialization (converts `star_rating` → `starRating`)
+- Use `@validates` decorators for field validation
 
-- Use SQLAlchemy models for database interactions
-- Use Flask blueprints for organizing routes
-- Follow RESTful API design principles
+### Svelte 5 Components (`client/src/components/`)
+```svelte
+let { game }: { game: Game } = $props();  <!-- Typed props with runes -->
+<button onclick={() => ...}>              <!-- Event attributes, not on:click -->
+```
+- Add `data-testid` attributes to all interactive elements for Playwright
 
-### Svelte and Astro Patterns
-
-- **Svelte 5 Components**: Use runes-based reactivity (`$state`, `$derived`, `$effect`, `$props`) - see `svelte.instructions.md`
-- **Astro Pages**: Use Astro for routing, layouts, and static content - see `astro.instructions.md`
-- Create reusable Svelte components when functionality is used in multiple places
-- Use `client:only="svelte"` directive when embedding Svelte in Astro pages
+### Astro Pages (`client/src/pages/`)
+```astro
+<GameList client:only="svelte" />  <!-- Always use client:only for Svelte -->
+```
 
 ### Styling
+- Dark theme exclusively: `bg-slate-800`, `text-slate-100`, `border-slate-700`
+- Tailwind CSS v4 utility classes only
 
-- Use Tailwind CSS utility classes exclusively - see `tailwindcss.instructions.md`
-- Dark theme colors: slate palette (`bg-slate-800`, `text-slate-100`, etc.)
-- Rounded corners and modern UI patterns
-- Follow modern UI/UX principles with clean, accessible interfaces
+## Testing Requirements
 
-### GitHub Actions workflows
+**Before committing**, run both test suites:
 
-- Follow good security practices
-- Make sure to explicitly set the workflow permissions
-- Add comments to document what tasks are being performed
+1. **Backend**: `.\scripts\run-server-tests.ps1` - Uses in-memory SQLite, see [test_games.py](server/tests/test_games.py) for patterns
+2. **Frontend**: `.\scripts\run-e2e-tests.ps1` - Uses `getByTestId()` locators, see [games.spec.ts](client/e2e-tests/games.spec.ts)
 
-## Scripts
+## Adding New Features
 
-- Several scripts exist in the `scripts` folder
-- Always use available scripts to perform tasks rather than performing operations manually
-- Existing scripts (use `.sh` on Linux/macOS/Codespaces, `.ps1` on Windows):
-    - `scripts/setup-env`: Performs installation of all Python and Node dependencies
-    - `scripts/run-server-tests`: Calls setup-env, then runs all Python tests
-    - `scripts/run-e2e-tests`: Runs Playwright E2E tests for frontend
-    - `scripts/start-app`: Calls setup-env, then starts both backend and frontend servers
-
-## Repository Structure
-
-- `server/`: Flask backend code
-  - `models/`: SQLAlchemy ORM models
-  - `routes/`: API endpoints organized by resource
-  - `tests/`: Unit tests for the API
-  - `utils/`: Utility functions and helpers
-- `client/`: Astro/Svelte frontend code
-  - `src/components/`: Reusable Svelte components
-  - `src/layouts/`: Astro layout templates
-  - `src/pages/`: Astro page routes
-  - `src/styles/`: CSS and Tailwind configuration
-  - `e2e-tests/`: Playwright E2E tests (home, games, filtering, accessibility)
-- `scripts/`: Development and deployment scripts
-- `data/`: Database files
-- `README.md`: Project documentation
+1. **New API endpoint**: Create blueprint in `server/routes/`, register in `app.py`, add tests
+2. **New page**: Create `*.astro` in `client/src/pages/`, use `Layout.astro`
+3. **New component**: Create Svelte 5 file with `$props()`, add `data-testid` attributes
