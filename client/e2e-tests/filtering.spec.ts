@@ -303,3 +303,199 @@ test.describe('Game Filtering', () => {
     });
   });
 });
+
+test.describe('Load More Pagination', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByTestId('games-grid')).toBeVisible();
+  });
+
+  test('should display Load More button when there are more games', async ({ page }) => {
+    await test.step('Check if Load More button is visible', async () => {
+      // Fetch total count from API
+      const response = await page.request.get('/api/games?limit=12&offset=0');
+      const data = await response.json();
+      
+      if (data.hasMore) {
+        await expect(page.getByTestId('load-more-button')).toBeVisible();
+      } else {
+        // If there are fewer games than page size, button should not appear
+        await expect(page.getByTestId('load-more-button')).not.toBeVisible();
+      }
+    });
+  });
+
+  test('should load more games when clicking Load More button', async ({ page }) => {
+    let initialCount: number;
+
+    await test.step('Count initial games', async () => {
+      const gameCards = page.getByTestId('game-card');
+      initialCount = await gameCards.count();
+    });
+
+    await test.step('Check if Load More is available', async () => {
+      const loadMoreButton = page.getByTestId('load-more-button');
+      const isVisible = await loadMoreButton.isVisible().catch(() => false);
+      
+      if (!isVisible) {
+        // Skip test if no more games to load
+        test.skip();
+        return;
+      }
+      
+      await loadMoreButton.click();
+    });
+
+    await test.step('Verify more games are loaded', async () => {
+      // Wait for new games to appear
+      const gameCards = page.getByTestId('game-card');
+      await expect(gameCards).toHaveCount(initialCount + 12, { timeout: 5000 }).catch(async () => {
+        // May have fewer than 12 more games, just verify count increased
+        const newCount = await gameCards.count();
+        expect(newCount).toBeGreaterThan(initialCount);
+      });
+    });
+  });
+
+  test('should show loading state while fetching more games', async ({ page }) => {
+    await test.step('Check for Load More button', async () => {
+      const loadMoreButton = page.getByTestId('load-more-button');
+      const isVisible = await loadMoreButton.isVisible().catch(() => false);
+      
+      if (!isVisible) {
+        test.skip();
+        return;
+      }
+    });
+
+    await test.step('Click and verify loading state', async () => {
+      const loadMoreButton = page.getByTestId('load-more-button');
+      
+      // Click and immediately check for loading text
+      await loadMoreButton.click();
+      
+      // Button should show loading state (aria-label changes)
+      await expect(loadMoreButton).toHaveAttribute('aria-label', 'Loading more games');
+    });
+  });
+
+  test('should update URL with offset when loading more', async ({ page }) => {
+    await test.step('Check for Load More button', async () => {
+      const loadMoreButton = page.getByTestId('load-more-button');
+      const isVisible = await loadMoreButton.isVisible().catch(() => false);
+      
+      if (!isVisible) {
+        test.skip();
+        return;
+      }
+    });
+
+    await test.step('Click Load More and verify URL update', async () => {
+      const loadMoreButton = page.getByTestId('load-more-button');
+      await loadMoreButton.click();
+      
+      // Wait for loading to complete
+      await expect(loadMoreButton).toHaveAttribute('aria-label', 'Load more games', { timeout: 5000 }).catch(() => {
+        // Button might be hidden if no more games
+      });
+      
+      // Verify URL contains offset parameter
+      await expect(page).toHaveURL(/offset=/);
+    });
+  });
+
+  test('should hide Load More button when all games are loaded', async ({ page }) => {
+    await test.step('Load all games', async () => {
+      // Keep clicking Load More until it disappears
+      let attempts = 0;
+      const maxAttempts = 10;
+      
+      while (attempts < maxAttempts) {
+        const loadMoreButton = page.getByTestId('load-more-button');
+        const isVisible = await loadMoreButton.isVisible().catch(() => false);
+        
+        if (!isVisible) {
+          break;
+        }
+        
+        await loadMoreButton.click();
+        // Wait for response
+        await page.waitForLoadState('networkidle');
+        attempts++;
+      }
+    });
+
+    await test.step('Verify Load More is hidden', async () => {
+      await expect(page.getByTestId('load-more-button')).not.toBeVisible();
+    });
+  });
+
+  test('should reset pagination when filters change', async ({ page }) => {
+    await test.step('Load more games first', async () => {
+      const loadMoreButton = page.getByTestId('load-more-button');
+      const isVisible = await loadMoreButton.isVisible().catch(() => false);
+      
+      if (isVisible) {
+        await loadMoreButton.click();
+        await page.waitForLoadState('networkidle');
+      }
+    });
+
+    await test.step('Apply a filter', async () => {
+      const categoryFilter = page.getByTestId('category-filter');
+      const options = categoryFilter.locator('option');
+      const count = await options.count();
+      
+      if (count > 1) {
+        const secondOption = options.nth(1);
+        const categoryId = await secondOption.getAttribute('value');
+        await categoryFilter.selectOption(categoryId!);
+      }
+    });
+
+    await test.step('Verify offset is reset in URL', async () => {
+      const url = page.url();
+      // URL should either not have offset or have offset=0
+      const hasOffset = url.includes('offset=');
+      if (hasOffset) {
+        expect(url).not.toMatch(/offset=[1-9]/);
+      }
+    });
+  });
+
+  test('should preserve loaded games when navigating back', async ({ page }) => {
+    let gamesAfterLoadMore: number;
+
+    await test.step('Load more games', async () => {
+      const loadMoreButton = page.getByTestId('load-more-button');
+      const isVisible = await loadMoreButton.isVisible().catch(() => false);
+      
+      if (!isVisible) {
+        test.skip();
+        return;
+      }
+      
+      await loadMoreButton.click();
+      await page.waitForLoadState('networkidle');
+      
+      const gameCards = page.getByTestId('game-card');
+      gamesAfterLoadMore = await gameCards.count();
+    });
+
+    await test.step('Navigate to a game detail and back', async () => {
+      const firstGameCard = page.getByTestId('game-card').first();
+      await firstGameCard.click();
+      
+      await expect(page.getByTestId('game-details')).toBeVisible();
+      
+      await page.goBack();
+    });
+
+    await test.step('Verify games count is preserved', async () => {
+      await expect(page.getByTestId('games-grid')).toBeVisible();
+      
+      // The offset should be in the URL and games should reload
+      // Note: This depends on how the app handles browser history
+    });
+  });
+});

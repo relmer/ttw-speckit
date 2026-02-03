@@ -80,14 +80,14 @@
 
 ### Implementation for User Story 2
 
-- [ ] T021 [US2] Create LoadMoreButton.svelte component in client/src/components/LoadMoreButton.svelte
-- [ ] T022 [US2] Add loading state and disabled styling to LoadMoreButton in client/src/components/LoadMoreButton.svelte
-- [ ] T023 [US2] Update GameList.svelte to track offset and hasMore state in client/src/components/GameList.svelte
-- [ ] T024 [US2] Implement loadMore function to append games in client/src/components/GameList.svelte
-- [ ] T025 [US2] Conditionally render LoadMoreButton based on hasMore in client/src/components/GameList.svelte
-- [ ] T026 [US2] Update URL sync to include offset parameter in client/src/components/GameList.svelte
-- [ ] T027 [US2] Add data-testid to LoadMoreButton in client/src/components/LoadMoreButton.svelte
-- [ ] T028 [P] [US2] Add load-more E2E tests in client/e2e-tests/filtering.spec.ts
+- [x] T021 [US2] Create LoadMoreButton.svelte component in client/src/components/LoadMoreButton.svelte
+- [x] T022 [US2] Add loading state and disabled styling to LoadMoreButton in client/src/components/LoadMoreButton.svelte
+- [x] T023 [US2] Update GameList.svelte to track offset and hasMore state in client/src/components/GameList.svelte
+- [x] T024 [US2] Implement loadMore function to append games in client/src/components/GameList.svelte
+- [x] T025 [US2] Conditionally render LoadMoreButton based on hasMore in client/src/components/GameList.svelte
+- [x] T026 [US2] Update URL sync to include offset parameter in client/src/components/GameList.svelte
+- [x] T027 [US2] Add data-testid to LoadMoreButton in client/src/components/LoadMoreButton.svelte
+- [x] T028 [P] [US2] Add load-more E2E tests in client/e2e-tests/filtering.spec.ts
 
 **Checkpoint**: User Story 2 complete - load more works with and without filters
 

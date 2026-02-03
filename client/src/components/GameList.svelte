@@ -5,6 +5,7 @@
     import ErrorMessage from "./ErrorMessage.svelte";
     import EmptyState from "./EmptyState.svelte";
     import FilterBar from "./FilterBar.svelte";
+    import LoadMoreButton from "./LoadMoreButton.svelte";
     import type { Game, GamesResponse } from "../types/game";
     import type { FilterOption, FilterState } from "../types/filter";
     import { PAGE_SIZE } from "../types/filter";
@@ -12,6 +13,7 @@
     // State
     let games = $state<Game[]>([]);
     let loading = $state(true);
+    let loadingMore = $state(false);
     let error = $state<string | null>(null);
     let categories = $state<FilterOption[]>([]);
     let publishers = $state<FilterOption[]>([]);
@@ -91,6 +93,16 @@
         syncUrl();
     }
 
+    // Load more games (append to existing)
+    function handleLoadMore(): void {
+        offset = offset + PAGE_SIZE;
+        loadingMore = true;
+        fetchGames(true).finally(() => {
+            loadingMore = false;
+            syncUrl();
+        });
+    }
+
     // Sync filter state to URL
     function syncUrl(): void {
         const params = new URLSearchParams();
@@ -159,10 +171,16 @@
             {/each}
         </div>
         
-        {#if loading}
+        {#if loadingMore}
             <div class="mt-6">
                 <LoadingSkeleton count={3} />
             </div>
         {/if}
+        
+        <LoadMoreButton 
+            loading={loadingMore} 
+            {hasMore} 
+            onLoadMore={handleLoadMore} 
+        />
     {/if}
 </div>
