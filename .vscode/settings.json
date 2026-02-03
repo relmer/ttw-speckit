@@ -25,4 +25,28 @@
     "editor.tabSize": 4,
     "chat.agent.enabled": true,
     "chat.agent.maxRequests": 100,
+    "chat.tools.autoApprove": true,
+    "github.copilot.chat.runCommand.enabled": true,
+    "chat.tools.terminal.autoApprove": {
+        "/.*/": true,        
+    },
+    "chat.promptFilesRecommendations": {
+        "speckit.constitution": true,
+        "speckit.specify": true,
+        "speckit.plan": true,
+        "speckit.tasks": true,
+        "speckit.implement": true
+    },
+    "chat.tools.edits.autoApprove": {
+        "**/*": true,
+        // "**/.vscode/*.json": false,
+        // "**/.git/**": false,
+        // "**/{package.json,package-lock.json,server.xml,build.rs,web.config,.gitattributes,.env}": false,
+        // "**/*.{code-workspace,csproj,fsproj,vbproj,vcxproj,proj,targets,props}": false
+    },
+    "chat.tools.terminal.enableAutoApprove": true
+    //"chat.tools.terminal.autoApprove": {
+    //    ".specify/scripts/bash/": true,
+    //    ".specify/scripts/powershell/": true
+    //}    
 }
