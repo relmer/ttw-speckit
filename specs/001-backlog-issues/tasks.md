@@ -31,17 +31,17 @@
 
 **⚠️ CRITICAL**: No frontend work can begin until this phase is complete
 
-- [ ] T003 Update GET /api/games with filter params (category_id, publisher_id, limit, offset) in server/routes/games.py
-- [ ] T004 Update GET /api/games response to include total and hasMore in server/routes/games.py
-- [ ] T005 [P] Create categories blueprint with GET /api/categories in server/routes/categories.py
-- [ ] T006 [P] Create publishers blueprint with GET /api/publishers in server/routes/publishers.py
-- [ ] T007 Register categories_bp and publishers_bp in server/app.py
-- [ ] T008 [P] Add filter/pagination tests in server/tests/test_games.py
-- [ ] T009 [P] Add categories endpoint tests in server/tests/test_categories.py
-- [ ] T010 [P] Add publishers endpoint tests in server/tests/test_publishers.py
-- [ ] T011 Run backend tests: .\scripts\run-server-tests.ps1
+- [x] T003 Update GET /api/games with filter params (category_id, publisher_id, limit, offset) in server/routes/games.py
+- [x] T004 Update GET /api/games response to include total and hasMore in server/routes/games.py
+- [x] T005 [P] Create categories blueprint with GET /api/categories in server/routes/categories.py
+- [x] T006 [P] Create publishers blueprint with GET /api/publishers in server/routes/publishers.py
+- [x] T007 Register categories_bp and publishers_bp in server/app.py
+- [x] T008 [P] Add filter/pagination tests in server/tests/test_games.py
+- [x] T009 [P] Add categories endpoint tests in server/tests/test_categories.py
+- [x] T010 [P] Add publishers endpoint tests in server/tests/test_publishers.py
+- [x] T011 Run backend tests: .\scripts\run-server-tests.ps1
 
-**Checkpoint**: API ready - all endpoints return expected data; tests pass
+**Checkpoint**: API ready - all endpoints return expected data; tests pass ✅ (31 tests)
 
 ---
 
