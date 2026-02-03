@@ -201,4 +201,173 @@ test.describe('Accessibility Tests', () => {
       await expect(gameCardSvgs.nth(i)).toHaveAttribute('aria-hidden', 'true');
     }
   });
+
+  test('FilterBar should have proper ARIA labels and focus states', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('[data-testid="filter-bar"]', { timeout: 10000 });
+
+    await test.step('Verify category filter has aria-label', async () => {
+      const categoryFilter = page.getByTestId('category-filter');
+      await expect(categoryFilter).toHaveAttribute('aria-label', 'Filter by category');
+    });
+
+    await test.step('Verify publisher filter has aria-label', async () => {
+      const publisherFilter = page.getByTestId('publisher-filter');
+      await expect(publisherFilter).toHaveAttribute('aria-label', 'Filter by publisher');
+    });
+
+    await test.step('Verify category filter has associated label', async () => {
+      const categoryLabel = page.locator('label[for="category-filter"]');
+      await expect(categoryLabel).toBeVisible();
+      await expect(categoryLabel).toHaveText('Category');
+    });
+
+    await test.step('Verify publisher filter has associated label', async () => {
+      const publisherLabel = page.locator('label[for="publisher-filter"]');
+      await expect(publisherLabel).toBeVisible();
+      await expect(publisherLabel).toHaveText('Publisher');
+    });
+
+    await test.step('Verify focus ring on category filter', async () => {
+      const categoryFilter = page.getByTestId('category-filter');
+      await categoryFilter.focus();
+      
+      const hasFocusStyles = await categoryFilter.evaluate((el) => {
+        const styles = window.getComputedStyle(el);
+        return styles.boxShadow !== 'none' || styles.outline !== 'none';
+      });
+      expect(hasFocusStyles).toBeTruthy();
+    });
+  });
+
+  test('LoadMoreButton should have proper accessibility attributes', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('[data-testid="games-grid"]', { timeout: 10000 });
+
+    const loadMoreButton = page.getByTestId('load-more-button');
+    const isVisible = await loadMoreButton.isVisible().catch(() => false);
+
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
+
+    await test.step('Verify Load More button has aria-label', async () => {
+      await expect(loadMoreButton).toHaveAttribute('aria-label', 'Load more games');
+    });
+
+    await test.step('Verify Load More button has visible focus ring', async () => {
+      await loadMoreButton.focus();
+      
+      const hasFocusStyles = await loadMoreButton.evaluate((el) => {
+        const styles = window.getComputedStyle(el);
+        return styles.boxShadow !== 'none' || styles.outline !== 'none';
+      });
+      expect(hasFocusStyles).toBeTruthy();
+    });
+
+    await test.step('Verify Load More button SVG has aria-hidden', async () => {
+      const buttonSvg = loadMoreButton.locator('svg');
+      const svgCount = await buttonSvg.count();
+      if (svgCount > 0) {
+        await expect(buttonSvg.first()).toHaveAttribute('aria-hidden', 'true');
+      }
+    });
+  });
+
+  test('Clear Filters button should have proper accessibility', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('[data-testid="filter-bar"]', { timeout: 10000 });
+
+    await test.step('Apply a filter to show Clear Filters button', async () => {
+      const categoryFilter = page.getByTestId('category-filter');
+      const options = categoryFilter.locator('option');
+      const count = await options.count();
+      if (count > 1) {
+        const secondOption = options.nth(1);
+        const categoryId = await secondOption.getAttribute('value');
+        await categoryFilter.selectOption(categoryId!);
+      }
+    });
+
+    const clearButton = page.getByTestId('clear-filters-button');
+    const isVisible = await clearButton.isVisible().catch(() => false);
+
+    if (!isVisible) {
+      test.skip();
+      return;
+    }
+
+    await test.step('Verify Clear Filters has aria-label', async () => {
+      await expect(clearButton).toHaveAttribute('aria-label', 'Clear all filters');
+    });
+
+    await test.step('Verify Clear Filters has visible focus ring', async () => {
+      await clearButton.focus();
+      
+      const hasFocusStyles = await clearButton.evaluate((el) => {
+        const styles = window.getComputedStyle(el);
+        return styles.boxShadow !== 'none' || styles.outline !== 'none';
+      });
+      expect(hasFocusStyles).toBeTruthy();
+    });
+  });
+
+  test('aria-live region should announce filter results', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('[data-testid="games-grid"]', { timeout: 10000 });
+
+    await test.step('Verify aria-live region exists', async () => {
+      const statusRegion = page.getByTestId('games-status');
+      await expect(statusRegion).toHaveAttribute('aria-live', 'polite');
+      await expect(statusRegion).toHaveAttribute('role', 'status');
+    });
+
+    await test.step('Verify status region has content', async () => {
+      const statusRegion = page.getByTestId('games-status');
+      const content = await statusRegion.textContent();
+      expect(content).toBeTruthy();
+      expect(content?.length).toBeGreaterThan(0);
+    });
+  });
+
+  test('keyboard navigation through filter controls', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForSelector('[data-testid="filter-bar"]', { timeout: 10000 });
+
+    await test.step('Tab through filter controls', async () => {
+      // Tab to category filter
+      let tabCount = 0;
+      let foundCategory = false;
+      
+      while (tabCount < 15 && !foundCategory) {
+        await page.keyboard.press('Tab');
+        tabCount++;
+        
+        const focusedElement = page.locator(':focus');
+        const testId = await focusedElement.getAttribute('data-testid').catch(() => null);
+        
+        if (testId === 'category-filter') {
+          foundCategory = true;
+        }
+      }
+      expect(foundCategory).toBeTruthy();
+    });
+
+    await test.step('Tab to publisher filter', async () => {
+      await page.keyboard.press('Tab');
+      const focusedElement = page.locator(':focus');
+      const testId = await focusedElement.getAttribute('data-testid');
+      expect(testId).toBe('publisher-filter');
+    });
+
+    await test.step('Interact with dropdown using keyboard', async () => {
+      // Publisher filter should be focused
+      await page.keyboard.press('ArrowDown'); // Open dropdown and move selection
+      await page.keyboard.press('Enter'); // Select option
+      
+      // Verify a filter was applied
+      await expect(page).toHaveURL(/publisher=/);
+    });
+  });
 });

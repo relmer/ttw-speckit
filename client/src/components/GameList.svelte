@@ -140,6 +140,23 @@
             : "No games available at the moment."
     );
 
+    // Derive status message for screen readers (aria-live announcements)
+    let statusMessage = $derived(() => {
+        if (loading && games.length === 0) {
+            return "Loading games...";
+        }
+        if (error) {
+            return `Error loading games: ${error}`;
+        }
+        if (games.length === 0) {
+            return emptyMessage;
+        }
+        const filterInfo = (filterState.categoryId !== null || filterState.publisherId !== null) 
+            ? " with current filters" 
+            : "";
+        return `Showing ${games.length} of ${total} games${filterInfo}.${hasMore ? " More games available." : ""}`;
+    });
+
     onMount(() => {
         readUrlParams();
         fetchCategories();
@@ -150,6 +167,17 @@
 
 <div>
     <h2 class="text-2xl font-medium mb-6 text-slate-100">Featured Games</h2>
+    
+    <!-- Screen reader announcements for dynamic content changes -->
+    <div 
+        class="sr-only" 
+        role="status" 
+        aria-live="polite" 
+        aria-atomic="true"
+        data-testid="games-status"
+    >
+        {statusMessage()}
+    </div>
     
     <FilterBar 
         {categories}

@@ -103,14 +103,14 @@
 
 ### Implementation for User Story 3
 
-- [ ] T029 [US3] Add aria-label attributes to FilterBar dropdowns in client/src/components/FilterBar.svelte
-- [ ] T030 [US3] Add associated labels with for attribute to all form controls in client/src/components/FilterBar.svelte
-- [ ] T031 [US3] Add aria-live="polite" region for dynamic announcements in client/src/components/GameList.svelte
-- [ ] T032 [US3] Add status message for filter/load results in aria-live region in client/src/components/GameList.svelte
-- [ ] T033 [US3] Verify focus:ring-2 focus:ring-blue-500 on all interactive elements in client/src/components/FilterBar.svelte
-- [ ] T034 [US3] Verify focus states on LoadMoreButton in client/src/components/LoadMoreButton.svelte
-- [ ] T035 [US3] Add keyboard event handlers (Enter, Escape) where needed in client/src/components/FilterBar.svelte
-- [ ] T036 [P] [US3] Update accessibility.spec.ts with new component tests in client/e2e-tests/accessibility.spec.ts
+- [x] T029 [US3] Add aria-label attributes to FilterBar dropdowns in client/src/components/FilterBar.svelte
+- [x] T030 [US3] Add associated labels with for attribute to all form controls in client/src/components/FilterBar.svelte
+- [x] T031 [US3] Add aria-live="polite" region for dynamic announcements in client/src/components/GameList.svelte
+- [x] T032 [US3] Add status message for filter/load results in aria-live region in client/src/components/GameList.svelte
+- [x] T033 [US3] Verify focus:ring-2 focus:ring-blue-500 on all interactive elements in client/src/components/FilterBar.svelte
+- [x] T034 [US3] Verify focus states on LoadMoreButton in client/src/components/LoadMoreButton.svelte
+- [x] T035 [US3] Add keyboard event handlers (Enter, Escape) where needed in client/src/components/FilterBar.svelte
+- [x] T036 [P] [US3] Update accessibility.spec.ts with new component tests in client/e2e-tests/accessibility.spec.ts
 - [ ] T037 [US3] Run axe-core audit and verify 0 violations (pass criteria: accessibilityScanResults.violations === [])
 
 **Checkpoint**: User Story 3 complete - axe-core passes, keyboard navigation works
