@@ -111,9 +111,9 @@
 - [x] T034 [US3] Verify focus states on LoadMoreButton in client/src/components/LoadMoreButton.svelte
 - [x] T035 [US3] Add keyboard event handlers (Enter, Escape) where needed in client/src/components/FilterBar.svelte
 - [x] T036 [P] [US3] Update accessibility.spec.ts with new component tests in client/e2e-tests/accessibility.spec.ts
-- [ ] T037 [US3] Run axe-core audit and verify 0 violations (pass criteria: accessibilityScanResults.violations === [])
+- [x] T037 [US3] Run axe-core audit and verify 0 violations (pass criteria: accessibilityScanResults.violations === [])
 
-**Checkpoint**: User Story 3 complete - axe-core passes, keyboard navigation works
+**Checkpoint**: User Story 3 complete - axe-core passes, keyboard navigation works ✅
 
 ---
 
@@ -121,14 +121,14 @@
 
 **Purpose**: Final validation across all user stories
 
-- [ ] T038 [P] Verify GameList resets offset to 0 when filters change (distinct from T017 URL sync; ensures fresh results)
-- [ ] T039 Run full E2E test suite: .\scripts\run-e2e-tests.ps1
-- [ ] T040 Run full backend test suite: .\scripts\run-server-tests.ps1
-- [ ] T041 [P] Verify SC-001: Filter results update <1s
-- [ ] T042 [P] Verify SC-002: Page load <2s
-- [ ] T043 Update GitHub issues #5, #6, #7 with completion status
+- [x] T038 [P] Verify GameList resets offset to 0 when filters change (distinct from T017 URL sync; ensures fresh results)
+- [x] T039 Run full E2E test suite: .\scripts\run-e2e-tests.ps1
+- [x] T040 Run full backend test suite: .\scripts\run-server-tests.ps1
+- [x] T041 [P] Verify SC-001: Filter results update <1s
+- [x] T042 [P] Verify SC-002: Page load <2s
+- [x] T043 Update GitHub issues #5, #6, #7 with completion status
 
-**Checkpoint**: All user stories complete - all tests pass, success criteria met
+**Checkpoint**: All user stories complete - all tests pass, success criteria met ✅
 
 ---
 

@@ -54,7 +54,9 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: '../scripts/start-app.sh',
+    command: process.platform === 'win32' 
+      ? 'powershell -ExecutionPolicy Bypass -File ../scripts/start-app.ps1'
+      : '../scripts/start-app.sh',
     url: 'http://localhost:4321',
     reuseExistingServer: true, // Always reuse existing server if available
     timeout: 120 * 1000, // 2 minutes to allow for setup
